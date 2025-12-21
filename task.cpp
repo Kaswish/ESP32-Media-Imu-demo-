@@ -65,45 +65,75 @@ static inline uint16_t grayTo565(uint8_t v) {
   return rgbTo565(v, v, v);
 }
 
-void drawSnow(Arduino_RGB_Display *gfx, uint32_t width, uint32_t height) {
-  if (!gfx) return;
+// void drawSnow(Arduino_RGB_Display *gfx, uint32_t width, uint32_t height) {
+//   if (!gfx) return;
 
-  // 每次调用绘制的雪花数量（可调，值越小越慢）
-  const uint32_t PIXELS_TO_DRAW = (width * height) / 2000; // 480x480 -> ~115 -> 试试 /2000 或 /3000 更慢
-  const uint8_t FLAKE_SIZE = 10; // 雪花方块大小，原来为10
+//   // 每次调用绘制的雪花数量（可调，值越小越慢）
+//   const uint32_t PIXELS_TO_DRAW = (width * height) / 2000; // 480x480 -> ~115 -> 试试 /2000 或 /3000 更慢
+//   const uint8_t FLAKE_SIZE = 10; // 雪花方块大小，原来为10
 
-  for (uint32_t i = 0; i < PIXELS_TO_DRAW; i++) {
-    uint16_t x = esp_random() % width;
-    uint16_t y = esp_random() % height;
+//   for (uint32_t i = 0; i < PIXELS_TO_DRAW; i++) {
+//     uint16_t x = esp_random() % width;
+//     uint16_t y = esp_random() % height;
 
-    // 选择颜色类别：白 / 灰 / 黑（按概率）
-    uint32_t r = esp_random() % 100; // 0..99
-    uint16_t color;
-    if (r < 30) {
-      // 白色系（亮灰，高亮度）
-      // 亮度范围 220..255
-      uint8_t v = 220 + (esp_random() % 36); // 220..255
-      color = grayTo565(v);
-    } else if (r < 90) {
-      // 灰色系（中间灰度）
-      // 亮度范围 40..200，可根据需要调整为更暗或更亮
-      uint8_t v = 40 + (esp_random() % 161); // 40..200
-      color = grayTo565(v);
-    } else {
-      // 黑色系（深灰/黑）
-      uint8_t v = esp_random() % 40; // 0..39
-      color = grayTo565(v);
-    }
+//     // 选择颜色类别：白 / 灰 / 黑（按概率）
+//     uint32_t r = esp_random() % 100; // 0..99
+//     uint16_t color;
+//     if (r < 30) {
+//       // 白色系（亮灰，高亮度）
+//       // 亮度范围 220..255
+//       uint8_t v = 220 + (esp_random() % 36); // 220..255
+//       color = grayTo565(v);
+//     } else if (r < 90) {
+//       // 灰色系（中间灰度）
+//       // 亮度范围 40..200，可根据需要调整为更暗或更亮
+//       uint8_t v = 40 + (esp_random() % 161); // 40..200
+//       color = grayTo565(v);
+//     } else {
+//       // 黑色系（深灰/黑）
+//       uint8_t v = esp_random() % 40; // 0..39
+//       color = grayTo565(v);
+//     }
 
-    gfx->fillRect(x, y, FLAKE_SIZE, FLAKE_SIZE, color);
+//     gfx->fillRect(x, y, FLAKE_SIZE, FLAKE_SIZE, color);
 
-    // 每若干个雪花让出一次 CPU，避免阻塞或触发看门狗
-    if ((i & 0xF) == 0) { // 每 16 个短暂让出一次
-      vTaskDelay(pdMS_TO_TICKS(20)); // 可改为 1~20ms 调整速度与流畅度
-    }
+//     // 每若干个雪花让出一次 CPU，避免阻塞或触发看门狗
+//     if ((i & 0xF) == 0) { // 每 16 个短暂让出一次
+//       vTaskDelay(pdMS_TO_TICKS(20)); // 可改为 1~20ms 调整速度与流畅度
+//     }
+//   }
+
+//   // 如果需要可以在这里调用 gfx->flush();（视后端而定）
+// }
+
+uint16_t snowColors[3] = {
+  0xFFFF,  // 白
+  grayTo565(128),  // 灰（中间亮度）
+  0x0000   // 黑
+};
+const uint8_t GRID_SIZE = 12;  // 12x12
+const uint16_t BLOCK_SIZE = 40;  // 40x40
+
+
+void drawSnow(Arduino_RGB_Display *gfx, uint32_t width, uint32_t height){
+  // 每次更新块的数量（可调，值越小更新越慢）
+  const uint8_t BLOCKS_TO_UPDATE = 16;  // 每次更新 20 块
+
+
+  for(int i=0;i < BLOCKS_TO_UPDATE; i++){
+  uint8_t row = esp_random() % GRID_SIZE;
+  uint8_t col = esp_random() % GRID_SIZE;
+
+  uint16_t x = col * BLOCK_SIZE;
+  uint16_t y = row * BLOCK_SIZE;
+
+  uint16_t color = snowColors[esp_random() % 3];
+
+  gfx->fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE, color);
+    
   }
+  vTaskDelay(pdMS_TO_TICKS(20));
 
-  // 如果需要可以在这里调用 gfx->flush();（视后端而定）
 }
 
 
