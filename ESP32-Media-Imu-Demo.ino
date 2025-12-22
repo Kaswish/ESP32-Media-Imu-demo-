@@ -36,8 +36,8 @@ Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
   10 /* B0 */, 11 /* B1 */, 12 /* B2 */, 13 /* B3 */, 14 /* B4 */,
   21 /* G0 */, 8 /* G1 */, 18 /* G2 */, 45 /* G3 */, 38 /* G4 */, 39 /* G5 */,
   40 /* R0 */, 41 /* R1 */, 42 /* R2 */, 2 /* R3 */, 1 /* R4 */,
-  1 /* hsync_polarity */, 255 /* hsync_front_porch */, 8 /* hsync_pulse_width */, 255 /* hsync_back_porch */,
-  1 /* vsync_polarity */, 250 /* vsync_front_porch */, 8 /* vsync_pulse_width */, 250 /* vsync_back_porch */);
+  1 /* hsync_polarity */, 10 /* hsync_front_porch */, 8 /* hsync_pulse_width */, 50 /* hsync_back_porch */,
+  1 /* vsync_polarity */, 10 /* vsync_front_porch */, 8 /* vsync_pulse_width */, 20 /* vsync_back_porch */);
 
 Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
   480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
