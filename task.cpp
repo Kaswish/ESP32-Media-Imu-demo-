@@ -1,10 +1,13 @@
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
 #include "task.h"
+#include "taskaudio.h"
 #include <LittleFS.h>
 #include "Arduino_GFX_Library.h"
 #include <JPEGDEC.h>
 #include "SensorQMI8658.hpp"
+
+#include "freertos/event_groups.h"
 
 extern Arduino_RGB_Display *gfx;
 extern const uint8_t *g_videoDataPtr; 
@@ -132,7 +135,7 @@ void drawSnow(Arduino_RGB_Display *gfx, uint32_t width, uint32_t height){
   gfx->fillRect(x, y, BLOCK_SIZE, BLOCK_SIZE, color);
     
   }
-  vTaskDelay(pdMS_TO_TICKS(20));
+  vTaskDelay(pdMS_TO_TICKS(50));
 
 }
 
@@ -178,11 +181,21 @@ void mjpegplayer(void *pvParameters){
         if (is_picked_up) {
           bool ok = mjpegPlayer.readMjpegBuf();
           if (!ok) {
+            // // 视频播放完毕，重置到开头（循环播放）
+            // mjpegPlayer.resetIndex();
+            // 如果需要延迟1秒再循环，添加这里：
+            vTaskDelay(pdMS_TO_TICKS(2000));
+            //vTaskDelay(pdMS_TO_TICKS(5));
+            /*use eventgropsync*/
+               xEventGroupSync( xHandle,
+                                MjpegTaskBit,
+                                ALL_SYNC_BITS,
+                                portMAX_DELAY );               
             // 视频播放完毕，重置到开头（循环播放）
             mjpegPlayer.resetIndex();
-            // 如果需要延迟1秒再循环，添加这里：
-            vTaskDelay(pdMS_TO_TICKS(1000));
+            vTaskDelay(pdMS_TO_TICKS(20));              
           }
+          
           else {
             // 解码和显示
             unsigned long decodeStart = millis();
@@ -195,6 +208,7 @@ void mjpegplayer(void *pvParameters){
             }
             // 控制帧率
             vTaskDelayUntil(&xLastWakeTime, xFrequency);
+          
           }
         } 
         else {
@@ -206,8 +220,6 @@ void mjpegplayer(void *pvParameters){
         break;
     }
   }
-
-
 
 }
 

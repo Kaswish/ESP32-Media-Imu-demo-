@@ -8,6 +8,11 @@
 #include "Arduino_GFX_Library.h"
 #include "SensorQMI8658.hpp"
 
+/*use eventgroup to controller multiple tasks*/
+#include "freertos/event_groups.h"
+// Define handle to receive return value
+EventGroupHandle_t xHandle = NULL;
+// Define flag bit in taskaudio.h
 
 /*MJpeg player related variables*/
 #define MJPEG_MAX_FRAME (256*1024)
@@ -42,7 +47,7 @@ Arduino_ESP32RGBPanel *rgbpanel = new Arduino_ESP32RGBPanel(
 Arduino_RGB_Display *gfx = new Arduino_RGB_Display(
   480 /* width */, 480 /* height */, rgbpanel, 0 /* rotation */, true /* auto_flush */,
   expander, GFX_NOT_DEFINED /* RST */, st7701_type1_init_operations, sizeof(st7701_type1_init_operations));
-
+  
 
 
 
@@ -127,6 +132,16 @@ void setup()
   expander->digitalWrite(3, HIGH);
   delay(200);
   audioinit();
+
+  /*Eventgroup Init*/
+  xHandle = xEventGroupCreate();
+    if (xHandle != NULL) {
+        printf("Create Eventgroup SUCCESS\n");
+    }
+    else {
+        printf("Create Eventgroup FALSE\n");
+    }
+
 
 
   Serial.println("Setup done.");

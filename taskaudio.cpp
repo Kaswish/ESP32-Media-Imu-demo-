@@ -8,7 +8,7 @@
 #include "ESP_I2S.h"
 #include "esp_check.h"
 #include "task.h"
-
+#include "freertos/event_groups.h"
 
 // I2C pins (demo used 47,48)
 #define I2C_PORT              0
@@ -140,6 +140,7 @@ void audioinit(){
 
 
 void audioplayer(void *pvParameters){
+  EventBits_t uxReturn;
   /*use state maschine*/
   File audio = LittleFS.open(WAV_PATH, "r");
   if (!audio) {
@@ -185,9 +186,21 @@ void audioplayer(void *pvParameters){
             bytesRemaining -= readLen;
           } 
           else{
-              vTaskDelay(pdMS_TO_TICKS(1000));  // delay
-              audio.seek(wavInfo.dataOffset);
-              bytesRemaining = wavInfo.dataSize;
+              vTaskDelay(pdMS_TO_TICKS(2000));
+              //vTaskDelay(pdMS_TO_TICKS(10));  // delay              
+              /*use eventgropsync*/
+               uxReturn = xEventGroupSync( xHandle,
+                                    AudioTaskBit,
+                                    ALL_SYNC_BITS,
+                                    portMAX_DELAY );
+
+              if((uxReturn & ALL_SYNC_BITS) == ALL_SYNC_BITS){              
+                audio.seek(wavInfo.dataOffset);
+                bytesRemaining = wavInfo.dataSize;
+                 vTaskDelay(pdMS_TO_TICKS(100));
+              }                      
+
+              
           }                   
         }
         else{
