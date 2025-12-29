@@ -6,9 +6,16 @@ ESP32-Media-Imu-demo
 &emsp;<br>
 
 &emsp;Demo Video1&2:<br>
+
 ![Demo](demopic.png)<br>
 
+
 Video link: https://github.com/Kaswish/ESP32-Media-Imu-Demo/issues/1
+
+
+Video link:
+(https://github.com/Kaswish/ESP32-Media-Imu-Demo/issues/1)
+
 <br>
 
 功能<br>
