@@ -5,10 +5,10 @@ ESP32-Media-Imu-demo
 &emsp;基于waveshare ESP32-S3 Smart 86 BOX 的音频+视频播放项目，使用6轴 IMU 实现控制播放逻辑的演示<br>
 &emsp;<br>
 
-
-&emsp;Demovideo1&2<br>
+&emsp;Demo Video1&2:<br>
 ![Demo](demopic.png)<br>
-https://github.com/Kaswish/ESP32-Media-Imu-Demo/issues/1
+
+Video link: https://github.com/Kaswish/ESP32-Media-Imu-Demo/issues/1
 <br>
 
 功能<br>
